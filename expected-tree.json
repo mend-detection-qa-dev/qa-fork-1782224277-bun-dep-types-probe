@@ -1,0 +1,130 @@
+{
+  "schema_version": "1.0",
+  "pm": "bun",
+  "pm_version_tested": "1.2.0",
+  "source_file": "bun.lock",
+  "generated_at": "2026-05-15T00:00:00+00:00",
+  "root": {
+    "name": "bun-dep-types-probe",
+    "version": "0.1.0",
+    "dependencies": [
+      "hono",
+      "typescript",
+      "react",
+      "fsevents"
+    ]
+  },
+  "packages": {
+    "hono": {
+      "version": "4.12.18",
+      "source": "registry",
+      "group": "main",
+      "dependencies": [],
+      "source_detail": {
+        "registry": "https://registry.npmjs.org"
+      }
+    },
+    "typescript": {
+      "version": "5.8.3",
+      "source": "registry",
+      "group": "dev",
+      "dependencies": [],
+      "source_detail": {
+        "registry": "https://registry.npmjs.org"
+      }
+    },
+    "react": {
+      "version": "18.3.1",
+      "source": "registry",
+      "group": "main",
+      "dependencies": [
+        "loose-envify"
+      ],
+      "source_detail": {
+        "registry": "https://registry.npmjs.org"
+      }
+    },
+    "fsevents": {
+      "version": "2.3.3",
+      "source": "registry",
+      "group": "main",
+      "optional": true,
+      "dependencies": [],
+      "source_detail": {
+        "registry": "https://registry.npmjs.org"
+      }
+    },
+    "loose-envify": {
+      "version": "1.4.0",
+      "source": "registry",
+      "group": "main",
+      "dependencies": [
+        "js-tokens"
+      ],
+      "source_detail": {
+        "registry": "https://registry.npmjs.org"
+      }
+    },
+    "js-tokens": {
+      "version": "4.0.0",
+      "source": "registry",
+      "group": "main",
+      "dependencies": [],
+      "source_detail": {
+        "registry": "https://registry.npmjs.org"
+      }
+    }
+  },
+  "project_metadata": {
+    "source_file": "bun.lock",
+    "groups": [
+      "main",
+      "dev"
+    ],
+    "trusted_dependencies": [
+      "fsevents",
+      "esbuild"
+    ]
+  },
+  "mend_expected_behavior": {
+    "group_classification": {
+      "hono": {
+        "manifest_field": "dependencies",
+        "expected_group": "main",
+        "expected_optional": false
+      },
+      "typescript": {
+        "manifest_field": "devDependencies",
+        "expected_group": "dev",
+        "expected_optional": false
+      },
+      "react": {
+        "manifest_field": "peerDependencies",
+        "expected_group": "main",
+        "expected_optional": false,
+        "note": "Bun auto-installs peer deps; resolved entry appears in lockfile packages section alongside runtime deps."
+      },
+      "fsevents": {
+        "manifest_field": "optionalDependencies",
+        "expected_group": "main",
+        "expected_optional": true,
+        "note": "optionalDependencies are main-group but must be flagged optional: true. fsevents is also darwin-only (os: darwin in lockfile)."
+      }
+    },
+    "trusted_dependencies_note": "trustedDependencies is an install-script allowlist only. It has no effect on dep-tree shape. 'esbuild' is listed but is NOT a direct dep — Mend must not invent a dep entry for it.",
+    "known_failure_modes": [
+      "Mend flattens all groups to 'main' — devDependencies loses group='dev' label.",
+      "Mend drops peerDependencies entirely because they are not in dependencies/devDependencies.",
+      "Mend drops fsevents because optional: true deps are excluded from the scan.",
+      "Mend misreads trustedDependencies as a dependency list and emits a ghost 'esbuild' dep.",
+      "Mend crashes on JSONC trailing commas in bun.lock before reaching any package entry."
+    ]
+  },
+  "warnings": [
+    "Bun is NOT a UA-supported resolver. Mend will attempt npm-resolver fallback against bun.lock. JSONC comments and trailing commas may cause parse failures depending on Mend UA version.",
+    "peerDependencies (react) appear in the lockfile 'packages' section alongside runtime deps because Bun auto-installs peers. Whether Mend classifies them as group='main' or drops them is the probe's primary classification assertion.",
+    "optionalDependencies (fsevents) carry os='darwin' in the lockfile metadata. On a Linux scan host Bun would skip installation; Mend's static parser should still report the dep with optional: true regardless of the scan host OS.",
+    "trustedDependencies lists 'esbuild' which has no corresponding package in this manifest or lockfile. Mend must ignore unknown trust entries — if a ghost 'esbuild' dep appears in the output tree, that is a false positive.",
+    "typescript group='dev' is the key assertion for the dep-types-basic pattern. If Mend emits group='main' for typescript, the group classification code path is broken."
+  ]
+}
